@@ -73,7 +73,7 @@ class Customers():
 
     def process_customers(self):
         customer_list = [self.depot] + self.orders
-        # print(customer_list)
+
         for idx, c in enumerate(customer_list): 
             c.current_vrp_index = idx
         
@@ -130,7 +130,7 @@ class Customers():
                 index and the 'to' node index and returns the distance in km.
         """
         self.make_distance_mat(**kwargs)
-        print(self.distmat)
+        # print(self.distmat)
 
         def dist_return(from_index, to_index):
             # Convert from routing variable Index to distance matrix NodeIndex.
@@ -146,7 +146,7 @@ class Customers():
             from_node = self.manager.IndexToNode(from_index)
             delivery_node = self.customers[from_node]
             if delivery_node.type == 1:
-                return int(-delivery_node.volume)
+                return -delivery_node.volume
             else:
                 return 0
 
@@ -158,9 +158,9 @@ class Customers():
             from_node = self.manager.IndexToNode(from_index)
             delivery_node = self.customers[from_node]
             if delivery_node.type == 1:
-                return int(-delivery_node.volume)
+                return -delivery_node.volume
             elif delivery_node.type == 2:
-                return int(delivery_node.volume)
+                return delivery_node.volume
             else:
                 return 0
 

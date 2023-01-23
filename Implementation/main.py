@@ -25,6 +25,34 @@ def generate_locs(num_rows):
     
     return np.array(result)
 
+def generate_random_problem(num_orders=50):
+    def generate_coordinates(center_lat, center_long, radius=27000):
+        radius_in_degrees = radius / 111300
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+        w = radius_in_degrees * math.sqrt(u)
+        t = 2 * math.pi * v
+        x = w * math.cos(t)
+        y = w * math.sin(t)
+        new_x = x / math.cos(math.radians(center_lat))
+        new_long = new_x + center_long
+        new_lat = y + center_lat
+        return [new_lat, new_long]
+        
+    depot = Node([12.9716, 77.5946], 0)
+    orders = []
+    vehicles = []
+
+    for i in range(num_orders):
+        orders.append(Order(1, generate_coordinates(12.9716, 77.5946), np.random.choice([1, 2], size=1, p=[0.7, 0.3])))
+    
+    num_vehicles = num_orders // 20
+    for i in range(num_vehicles):
+        vehicles.append(Vehicle(25, start=depot, end=depot))
+    
+    print(len(orders), len(vehicles))
+    return depot, orders, vehicles
+
 def vehicle_output_string(manager, routing, plan):
     """
     Return a string displaying the output of the routing instance and
@@ -77,47 +105,37 @@ def vehicle_output_string(manager, routing, plan):
         plan_output += '\n'
 
     return (plan_output, dropped)
-
+    
 if __name__ == '__main__':
-    depot_location = [[0, 0]]
-
-    delivery_locations = np.array([[0, 1], [1, 0], [1, 4], [2, 5], [6, 9]])
-    delivery_weights = [1, 1, 1, 1, 1]
+    # depot = Node([0, 0], 0)
+    # orders = [Order(1, [0, 1], 1), Order(1, [1, 0], 1), Order(1, [1, 4], 1), Order(1, [2, 5], 1), Order(1, [6, 9], 1), 
+    #         Order(1, [5, 3], 2), Order(1, [3, 1], 2), Order(1, [1, 6], 2), Order(1, [-5, -3], 1), Order(1, [-1, -4], 1), Order(1, [-3, 2], 1)]
+    # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
+    # vehicles = [Vehicle(3, start=depot, end=depot)]
     
+    depot, orders, vehicles = generate_random_problem(num_orders=80)
 
-    pickup_locations = np.array([[5, 3], [3, 1], [1, 6]])
-    pickup_weights = [1, 1, 1]
-
-    orders = [Order(1, [0, 1], 1), Order(1, [1, 0], 1), Order(1, [1, 4], 1), Order(1, [2, 5], 1), Order(1, [6, 9], 1), 
-            Order(1, [5, 3], 2), Order(1, [3, 1], 2), Order(1, [1, 6], 2), Order(1, [-5, -3], 1), Order(1, [-1, -4], 1), Order(1, [-3, 2], 1)]
-    depot = Node([0, 0], 0)
-    vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
-    
     vrp_instance = VRP(depot, orders, vehicles)
     manager, routing, solution = vrp_instance.process_VRP()
 
     plan_output, dropped = vehicle_output_string(manager, routing, solution)
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
-
-    vrp_instance.vehicle_output_plot(block=False)
-    routes_list = vrp_instance.get_routes()
-    routes_list[3].next_node(3)
-    routes_list[3].next_node(3)
-    routes_list[2].next_node(3)
-    routes_list[2].next_node(3)
-    routes_list[2].next_node(3)
-
-    # routes_list[0].next_node(3)
-
-
-    print(routes_list[2].get_current_node().current_vrp_index)
-
-    manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
     vrp_instance.vehicle_output_plot()
-    plan_output, dropped = vehicle_output_string(manager, routing, solution)
-    print(plan_output)
-    print('dropped nodes: ' + ', '.join(dropped))
+
+    # vrp_instance.vehicle_output_plot(block=False)
+    # routes_list = vrp_instance.get_routes()
+    # routes_list[3].next_node(3)
+    # routes_list[3].next_node(3)
+    # routes_list[2].next_node(3)
+    # routes_list[2].next_node(3)
+    # routes_list[2].next_node(3)
+
+    # manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
+    # vrp_instance.vehicle_output_plot()
+    # plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    # print(plan_output)
+    # print('dropped nodes: ' + ', '.join(dropped))
 
 
 

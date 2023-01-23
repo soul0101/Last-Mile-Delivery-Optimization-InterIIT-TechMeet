@@ -20,7 +20,7 @@ class VRP:
     def update_routed_order_status(self, manager, routing, solution):
         for order in range(routing.Size()):
             if (solution.Value(routing.NextVar(order)) == order):
-                self.customers[order].update_order_status(1)
+                self.customers.customers[order].update_order_status(1)
 
         for vehicle_idx in range(self.fleet.num_vehicles):
             veh_used = routing.IsVehicleUsed(solution, vehicle_idx)
@@ -72,9 +72,11 @@ class VRP:
                 s_pick_x.append(order.lat)
                 s_pick_y.append(order.lon)
 
+            plt.text(order.lat, order.lon, order.current_vrp_index, fontsize = 8)
+
         plt.scatter(s_del_x, s_del_y, color='b', label='Delivery')
         plt.scatter(s_pick_x, s_pick_y, color='g', label='Pickup')
-        plt.scatter(self.depot.lat, self.depot.lon, color='r', label='Depot')
+        plt.scatter(self.depot.lat, self.depot.lon, color='black', s=70, label='Depot')
 
         for vehicle_idx, route in self.routes_list.items():
             if route == -1:
@@ -138,7 +140,6 @@ class VRP:
 
         # total_transit_time = 360
         total_transit_time = 10000000
-        print(tot_time_fn(1, 2))
         tot_time_fn_index = routing.RegisterTransitCallback(tot_time_fn)
         routing.AddDimension(
             tot_time_fn_index,  # total time function callback
@@ -180,20 +181,21 @@ class VRP:
         if isReroute: 
             for i, order in enumerate(self.customers.orders): 
                 if order.status == 2 and order.type == 1:
-                    print(i+1, order.vehicle.vehicle_index)
                     routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
 
         parameters = pywrapcp.DefaultRoutingSearchParameters()
         # Setting first solution heuristic (cheapest addition).
         parameters.first_solution_strategy = (routing_enums_pb2.FirstSolutionStrategy.AUTOMATIC)
         parameters.local_search_metaheuristic = (routing_enums_pb2.LocalSearchMetaheuristic.AUTOMATIC)
+        # parameters.local_search_metaheuristic = (routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH)
+
         # Routing: forbids use of TSPOpt neighborhood, (this is the default behaviour)
         # parameters.local_search_operators.use_tsp_opt = pywrapcp.BOOL_FALSE
         # Disabling Large Neighborhood Search, (this is the default behaviour)
         # parameters.local_search_operators.use_path_lns = pywrapcp.BOOL_FALSE
         # parameters.local_search_operators.use_inactive_lns = pywrapcp.BOOL_FALSE
     
-        parameters.time_limit.FromSeconds(60)
+        parameters.time_limit.FromSeconds(300)
         # parameters.use_full_propagation = True
 
         solution = routing.SolveWithParameters(parameters)
@@ -203,7 +205,6 @@ class VRP:
             self.update_routed_order_status(manager, routing, solution)
             self.build_vehicle_routes(manager, routing, solution)
             return manager, routing, solution
-        print(routing.status())
             
     def bin_pack(self, vehicle_id, order_ids, dimensions):
         pass

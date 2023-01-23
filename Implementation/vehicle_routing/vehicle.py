@@ -100,7 +100,6 @@ class Fleet:
         # self.starting_position = [vehicle.start for vehicle in self.vehicle_list]
 
     def set_starts_ends(self):
-        print(self.vehicle_list[0].start.current_vrp_index)
         self.starts = [v.start.current_vrp_index for v in self.vehicle_list]
         self.ends = [0] * len(self.starts)
         
