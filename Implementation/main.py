@@ -121,21 +121,21 @@ if __name__ == '__main__':
     plan_output, dropped = vehicle_output_string(manager, routing, solution)
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
-    vrp_instance.vehicle_output_plot()
-
-    # vrp_instance.vehicle_output_plot(block=False)
-    # routes_list = vrp_instance.get_routes()
-    # routes_list[3].next_node(3)
-    # routes_list[3].next_node(3)
-    # routes_list[2].next_node(3)
-    # routes_list[2].next_node(3)
-    # routes_list[2].next_node(3)
-
-    # manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
     # vrp_instance.vehicle_output_plot()
-    # plan_output, dropped = vehicle_output_string(manager, routing, solution)
-    # print(plan_output)
-    # print('dropped nodes: ' + ', '.join(dropped))
+
+    vrp_instance.vehicle_output_plot(block=False)
+    routes_list = vrp_instance.get_routes()
+    routes_list[3].next_node(3)
+    routes_list[3].next_node(3)
+    routes_list[2].next_node(3)
+    routes_list[2].next_node(3)
+    routes_list[2].next_node(3)
+
+    manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
+    vrp_instance.vehicle_output_plot()
+    plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    print(plan_output)
+    print('dropped nodes: ' + ', '.join(dropped))
 
 
 

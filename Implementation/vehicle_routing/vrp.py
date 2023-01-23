@@ -176,12 +176,7 @@ class VRP:
             routing.solver().Add(deliveries_dimension.CumulVar(index) == loads_dimension.CumulVar(index))
 
         for node in range(1, self.customers.number):
-            routing.AddDisjunction([manager.NodeToIndex(node)], self.customers.customers[node].carryforward_penalty)    
-
-        if isReroute: 
-            for i, order in enumerate(self.customers.orders): 
-                if order.status == 2 and order.type == 1:
-                    routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
+            routing.AddDisjunction([manager.NodeToIndex(node)], self.customers.customers[node].carryforward_penalty)
 
         parameters = pywrapcp.DefaultRoutingSearchParameters()
         # Setting first solution heuristic (cheapest addition).
@@ -196,9 +191,29 @@ class VRP:
         # parameters.local_search_operators.use_inactive_lns = pywrapcp.BOOL_FALSE
     
         parameters.time_limit.FromSeconds(300)
-        # parameters.use_full_propagation = True
+        # parameters.use_full_propagation = True    
 
-        solution = routing.SolveWithParameters(parameters)
+        if isReroute: 
+            for i, order in enumerate(self.customers.orders): 
+                if order.status == 2 and order.type == 1:
+                    routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
+
+            initial_solution = []
+            for route in self.routes_list:
+                temp = []
+                for node in route:
+                    if node.status in [3,4]:
+                        continue
+                    else:
+                        temp.append(node.current_vrp_index)
+                initial_solution.append(temp)
+            solution = routing.SolveFromAssignmentWithParameters( initial_solution, parameters)
+        
+        else:
+            solution = routing.SolveWithParameters(parameters)
+
+    
+        
 
         if solution: 
             # Process Solution
