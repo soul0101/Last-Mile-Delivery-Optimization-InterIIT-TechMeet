@@ -198,15 +198,21 @@ class VRP:
                 if order.status == 2 and order.type == 1:
                     routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
 
-            initial_solution = []
-            for route in self.routes_list:
+            curr_solution = []
+            print(self.routes_list)
+            for route in list(self.routes_list.values()):
                 temp = []
-                for node in route:
-                    if node.status in [3,4]:
-                        continue
-                    else:
-                        temp.append(node.current_vrp_index)
-                initial_solution.append(temp)
+                print(route)
+                if route!=-1:
+                    for node in route.route:
+                        if node.status in [3,4]:
+                            continue
+                        else:
+                            temp.append(node.current_vrp_index)
+                    curr_solution.append(temp)
+            print(curr_solution)
+            initial_solution = routing.ReadAssignmentFromRoutes(curr_solution,True)
+            routing.CloseModelWithParameters(parameters)
             solution = routing.SolveFromAssignmentWithParameters( initial_solution, parameters)
         
         else:
