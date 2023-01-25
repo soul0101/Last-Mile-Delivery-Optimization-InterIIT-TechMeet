@@ -41,12 +41,12 @@ class Vehicle:
             pass
         else:
             pass
-        if order_status==4: #successful
+        if order_status==3: #successful
             self.total_volume_capacity -= load_volume
             self.available_volume_capacity -= load_volume
         else:
             pass
-        if order_status==4: #successful
+        if order_status==3: #successful
             self.available_volume_capacity += load_volume
         else:
             self.total_volume_capacity -= load_volume
@@ -100,6 +100,7 @@ class Fleet:
         # self.starting_position = [vehicle.start for vehicle in self.vehicle_list]
 
     def set_starts_ends(self):
+        print(self.vehicle_list[0].start.current_vrp_index)
         self.starts = [v.start.current_vrp_index for v in self.vehicle_list]
         self.ends = [0] * len(self.starts)
         

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from vehicle_routing.customers import Order, Customers
 from vehicle_routing.vehicle import Vehicle, Fleet
-from vehicle_routing.route import Route
+from vehicle_routing.route import Route, RoutesList
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver import routing_enums_pb2
 
@@ -14,8 +14,11 @@ class VRP:
         self.fleet = None   
         self.routes_list = None
 
+    def add_dynamic_order(self, new_order):
+        self.orders.append(new_order)
+
     def get_routes(self):
-        return self.routes_list
+        return self.routes_list.routes_list
 
     def update_routed_order_status(self, manager, routing, solution):
         for order in range(routing.Size()):
@@ -55,7 +58,7 @@ class VRP:
             
             self.fleet.vehicle_list[vehicle_idx].route = routes_list[vehicle_idx]
         
-        self.routes_list = routes_list
+        self.routes_list = RoutesList(routes_list)
 
     def vehicle_output_plot(self, block=True):
         plt.figure()
@@ -78,7 +81,7 @@ class VRP:
         plt.scatter(s_pick_x, s_pick_y, color='g', label='Pickup')
         plt.scatter(self.depot.lat, self.depot.lon, color='black', s=70, label='Depot')
 
-        for vehicle_idx, route in self.routes_list.items():
+        for vehicle_idx, route in self.get_routes().items():
             if route == -1:
                 continue
 
@@ -190,26 +193,16 @@ class VRP:
         # parameters.local_search_operators.use_path_lns = pywrapcp.BOOL_FALSE
         # parameters.local_search_operators.use_inactive_lns = pywrapcp.BOOL_FALSE
     
-        parameters.time_limit.FromSeconds(300)
+        parameters.time_limit.FromSeconds(30)
         # parameters.use_full_propagation = True    
 
         if isReroute: 
+            parameters.local_search_metaheuristic = (routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
             for i, order in enumerate(self.customers.orders): 
                 if order.status == 2 and order.type == 1:
                     routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
 
-            curr_solution = []
-            print(self.routes_list)
-            for route in list(self.routes_list.values()):
-                temp = []
-                print(route)
-                if route!=-1:
-                    for node in route.route:
-                        if node.status in [3,4]:
-                            continue
-                        else:
-                            temp.append(node.current_vrp_index)
-                    curr_solution.append(temp)
+            curr_solution = self.routes_list.get_initial_routes()
             print(curr_solution)
             initial_solution = routing.ReadAssignmentFromRoutes(curr_solution,True)
             routing.CloseModelWithParameters(parameters)

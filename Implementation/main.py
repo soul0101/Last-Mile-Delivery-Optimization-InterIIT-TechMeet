@@ -25,26 +25,32 @@ def generate_locs(num_rows):
     
     return np.array(result)
 
+def generate_coordinates(center_lat, center_long, radius=27000):
+    radius_in_degrees = radius / 111300
+    u = random.uniform(0, 1)
+    v = random.uniform(0, 1)
+    w = radius_in_degrees * math.sqrt(u)
+    t = 2 * math.pi * v
+    x = w * math.cos(t)
+    y = w * math.sin(t)
+    new_x = x / math.cos(math.radians(center_lat))
+    new_long = new_x + center_long
+    new_lat = y + center_lat
+    return [new_lat, new_long]
+
+def generate_random_order(type=None):
+    if type is None:
+        type = np.random.choice([1, 2], size=1, p=[0.7, 0.3])
+
+    return Order(1, generate_coordinates(12.9716, 77.5946), type)
+
 def generate_random_problem(num_orders=50):
-    def generate_coordinates(center_lat, center_long, radius=27000):
-        radius_in_degrees = radius / 111300
-        u = random.uniform(0, 1)
-        v = random.uniform(0, 1)
-        w = radius_in_degrees * math.sqrt(u)
-        t = 2 * math.pi * v
-        x = w * math.cos(t)
-        y = w * math.sin(t)
-        new_x = x / math.cos(math.radians(center_lat))
-        new_long = new_x + center_long
-        new_lat = y + center_lat
-        return [new_lat, new_long]
-        
     depot = Node([12.9716, 77.5946], 0)
     orders = []
     vehicles = []
 
     for i in range(num_orders):
-        orders.append(Order(1, generate_coordinates(12.9716, 77.5946), np.random.choice([1, 2], size=1, p=[0.7, 0.3])))
+        orders.append(generate_random_order())
     
     num_vehicles = num_orders // 20
     for i in range(num_vehicles):
@@ -125,11 +131,23 @@ if __name__ == '__main__':
 
     vrp_instance.vehicle_output_plot(block=False)
     routes_list = vrp_instance.get_routes()
-    # routes_list[3].next_node(3)
-    # routes_list[3].next_node(3)
-    # routes_list[2].next_node(3)
-    # routes_list[2].next_node(3)
-    # routes_list[2].next_node(3)
+    routes_list[4].next_node(3)
+    routes_list[4].next_node(3)
+    routes_list[5].next_node(3)
+    routes_list[5].next_node(3)
+    routes_list[5].next_node(3)
+    routes_list[6].next_node(3)
+    routes_list[6].next_node(3)
+    routes_list[7].next_node(3)
+    routes_list[7].next_node(3)
+
+
+    vrp_instance.add_dynamic_order(generate_random_order())
+    vrp_instance.add_dynamic_order(generate_random_order())
+    vrp_instance.add_dynamic_order(generate_random_order())
+    vrp_instance.add_dynamic_order(generate_random_order())
+    vrp_instance.add_dynamic_order(generate_random_order())
+    vrp_instance.add_dynamic_order(generate_random_order())
 
     manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
     vrp_instance.vehicle_output_plot()
