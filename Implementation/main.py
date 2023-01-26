@@ -119,7 +119,7 @@ if __name__ == '__main__':
     # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
     # vehicles = [Vehicle(3, start=depot, end=depot)]
     
-    depot, orders, vehicles = generate_random_problem(num_orders=200)
+    depot, orders, vehicles = generate_random_problem(num_orders=500)
 
     vrp_instance = VRP(depot, orders, vehicles)
     manager, routing, solution = vrp_instance.process_VRP()
@@ -131,16 +131,20 @@ if __name__ == '__main__':
 
     vrp_instance.vehicle_output_plot(block=False)
     routes_list = vrp_instance.get_routes()
-    routes_list[4].next_node(3)
-    routes_list[4].next_node(3)
-    routes_list[5].next_node(3)
-    routes_list[5].next_node(3)
-    routes_list[5].next_node(3)
-    routes_list[6].next_node(3)
-    routes_list[6].next_node(3)
-    routes_list[7].next_node(3)
-    routes_list[7].next_node(3)
+    # routes_list[4].next_node(3)
+    # routes_list[4].next_node(3)
+    # routes_list[5].next_node(3)
+    # routes_list[5].next_node(3)
+    # routes_list[5].next_node(3)
+    # routes_list[6].next_node(3)
+    # routes_list[6].next_node(3)
+    # routes_list[7].next_node(3)
+    # routes_list[7].next_node(3)
+    for i in range(5):
+        routes_list[14].next_node(3)
 
+    for i in range(5):
+        routes_list[19].next_node(3)
 
     vrp_instance.add_dynamic_order(generate_random_order())
     vrp_instance.add_dynamic_order(generate_random_order())

@@ -7,7 +7,21 @@ from ortools.constraint_solver import routing_enums_pb2
 
 class VRP:
     """
-        
+       The main solver class for solving the VRP problem
+
+       Attributes:
+        depot : location of the depot
+        orders : List of orders to be serviced
+        vehicles : list of indexes of vehicles available
+        customers :
+        fleet :
+        routes_list : The list of routes (route object) generated
+
+        Methods:
+            add_dynamic_order(new_order) : Add orders dynamically
+            get_routes() : returns the list of routes
+            update_routed_order_status : Set the status of each order after the rouying is completed
+
     """
     def __init__(self, depot, orders=None, vehicles=None):
         self.depot = depot
@@ -196,11 +210,11 @@ class VRP:
         # parameters.local_search_operators.use_path_lns = pywrapcp.BOOL_FALSE
         # parameters.local_search_operators.use_inactive_lns = pywrapcp.BOOL_FALSE
     
-        parameters.time_limit.FromSeconds(30)
+        parameters.time_limit.FromSeconds(300)
         # parameters.use_full_propagation = True    
 
         if isReroute: 
-            parameters.local_search_metaheuristic = (routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
+            parameters.local_search_metaheuristic = (routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING)
             for i, order in enumerate(self.customers.orders): 
                 if order.status == 2 and order.type == 1:
                     routing.VehicleVar(manager.NodeToIndex(i+1)).SetValues([order.vehicle.vehicle_index])
