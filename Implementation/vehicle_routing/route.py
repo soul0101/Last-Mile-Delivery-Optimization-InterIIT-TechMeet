@@ -1,6 +1,12 @@
 from vehicle_routing.customers import Order, Node
 
 class Route:
+    """
+        Stores the info about a created route.
+        route : List of Order Objects
+        current_node : The current position of the vehicle in the route
+        vehicle : the vehicle assigned to the current route
+    """
     def __init__(self, route, vehicle):
         self.route = route
         self.current_node = 0
@@ -30,15 +36,25 @@ class Route:
         return self.route[self.current_node]
 
 class RoutesList():
+    """
+        Stores the routes of different vehicles.
+
+        routes_list is a dictionary with key being the vehicle index and the value being the route ( Route object)
+
+        get_initial_routes : returns the route while excluding the completed, failed ,start and end nodes.
+        This will be used to speed up the algorithm while recalculating the route
+
+
+    """
     def __init__(self, routes_list):
         self.routes_list = routes_list
     
     def get_initial_routes(self):
         curr_solution = []
-        print(self.routes_list)
+        print("Route List",self.routes_list)
         for vehicle_idx, route in self.routes_list.items():
             temp = []
-            print(route)
+            #route == -1 means the vehicle is not assigned any route
             if route != -1:
                 for node in route.route:
                     if node.status in [3,4]:

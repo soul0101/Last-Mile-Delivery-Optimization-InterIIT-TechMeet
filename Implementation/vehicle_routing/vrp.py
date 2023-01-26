@@ -6,6 +6,9 @@ from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver import routing_enums_pb2
 
 class VRP:
+    """
+        
+    """
     def __init__(self, depot, orders=None, vehicles=None):
         self.depot = depot
         self.orders = orders

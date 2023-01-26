@@ -49,10 +49,12 @@ class Order(Node):
             if new_status == 4:
                 # Delivery failed: Reduce vehicle capacity by order volume
                 self.vehicle.actual_volume_capacity -= self.volume
+                self.vehicle.available_volume_capacity -= self.volume
         if self.type == 2:
             if new_status == 3:
                 # Pickup Successful: Reduce vehicle capacity by order volume
                 self.vehicle.actual_volume_capacity -= self.volume
+                self.vehicle.available_volume_capacity -= self.volume
         
         self.status = new_status
 
