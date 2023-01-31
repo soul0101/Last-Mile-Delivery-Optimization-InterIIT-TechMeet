@@ -130,7 +130,7 @@ class VRP:
         plt.legend()
         plt.show(block=block)
 
-    def process_VRP(self, isReroute=False, time_limit=300, total_transit_time = 10000000, first_sol_strategy="AUTOMATIC", initial_metaheuristic="AUTOMATIC", rerouting_metaheuristic="AUTOMATIC"):
+    def process_VRP(self, isReroute=False, time_limit=300, total_transit_time = 10000000, max_wait_time=10000, first_sol_strategy="AUTOMATIC", initial_metaheuristic="AUTOMATIC", rerouting_metaheuristic="AUTOMATIC"):
         self.fleet = Fleet(self.vehicles)
         self.customers = Customers(self.depot, self.orders)
         self.fleet.set_starts_ends()
@@ -179,7 +179,7 @@ class VRP:
         tot_time_fn_index = routing.RegisterTransitCallback(tot_time_fn)
         routing.AddDimension(
             tot_time_fn_index,  # total time function callback
-            15, 
+            max_wait_time, 
             total_transit_time,
             True,
             'Time')
