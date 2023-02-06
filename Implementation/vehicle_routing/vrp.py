@@ -130,7 +130,11 @@ class VRP:
         plt.legend()
         plt.show(block=block)
 
-    def process_VRP(self, isReroute=False, centrality_check=False, time_limit=300, total_transit_time = 10000000, max_wait_time=10000, max_route_distance=50000, first_sol_strategy="AUTOMATIC", initial_metaheuristic="AUTOMATIC", rerouting_metaheuristic="AUTOMATIC"):
+    def process_VRP(self, isReroute=False, centrality_check=False, 
+            time_limit=300, total_transit_time = 10_000_000, max_wait_time=10_000, 
+            max_route_distance=50_000, equalize_routes=False, equalize_routes_penalty=10_000,
+            first_sol_strategy="AUTOMATIC", initial_metaheuristic="AUTOMATIC", rerouting_metaheuristic="AUTOMATIC"):
+
         self.fleet = Fleet(self.vehicles)
         self.customers = Customers(self.depot, self.orders)
         self.fleet.set_starts_ends()
@@ -168,6 +172,29 @@ class VRP:
             max_route_distance,
             True,
             'Distance')
+        distance_dimension = routing.GetDimensionOrDie('Distance')
+        
+        # if global_span_coefficient is not None:
+        #     distance_dimension.SetGlobalSpanCostCoefficient(global_span_coefficient)
+
+        if equalize_routes:
+            routing.AddConstantDimension(
+                1, # increment by one every time
+                self.customers.number, # large enough
+                True,  # set count to zero
+            'Count')
+
+            count_dimension = routing.GetDimensionOrDie('Count')
+            count_dimension.SetGlobalSpanCostCoefficient(equalize_routes_penalty)
+
+            # Add penalty if vehicle serve too much nodes
+            for v in range(manager.GetNumberOfVehicles()):
+                end = routing.End(v)
+                count_dimension.SetCumulVarSoftUpperBound(
+                    end, # index
+                    (self.customers.number - 1) // self.fleet.num_vehicles + 1, # soft max
+                    equalize_routes_penalty # penalty
+                )
 
         print(
             self.customers.number,  # int number
