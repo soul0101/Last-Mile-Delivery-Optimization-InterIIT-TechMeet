@@ -79,6 +79,7 @@ if __name__ == '__main__':
     plan_output, dropped = vehicle_output_string(manager, routing, solution)
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
+    vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
     vrp_instance.vehicle_output_plot()
 
     # vrp_instance.vehicle_output_plot(block=False)
