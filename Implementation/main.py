@@ -6,58 +6,6 @@ from vehicle_routing.vrp import VRP
 import vehicle_routing.helper as helper
 
 from datetime import timedelta
-
-def vehicle_output_string(manager, routing, plan):
-    """
-    Return a string displaying the output of the routing instance and
-    assignment (plan).
-    
-    Arguments: 
-    ------------------
-    routing: ortools.constraint_solver.pywrapcp.RoutingModel 
-    plan: ortools.constraint_solver.pywrapcp.Assignment
-        The returned solution from the solver.
-    Returns:
-        (string) plan_output: describing each vehicle's plan.
-        (List) dropped: list of dropped orders.
-    """
-    print('The Objective Value is {0}'.format(plan.ObjectiveValue()))
-    dropped = []
-    for order in range(routing.Size()):
-        if (plan.Value(routing.NextVar(order)) == order):
-            dropped.append(str(order))
-
-    deliveries_dimension = routing.GetDimensionOrDie('Deliveries')
-    loads_dimension = routing.GetDimensionOrDie('Loads')
-    time_dimension = routing.GetDimensionOrDie('Time')
-    plan_output = ''
-
-    for route_number in range(routing.vehicles()):
-        order = routing.Start(route_number)
-        plan_output += 'Route {0}:'.format(route_number)
-        if routing.IsEnd(plan.Value(routing.NextVar(order))):
-            plan_output += ' Empty \n'
-        else:
-            while True:
-                load_var = loads_dimension.CumulVar(order)
-                delivery_var = deliveries_dimension.CumulVar(order)
-                time_var = time_dimension.CumulVar(order)
-                node = manager.IndexToNode(order)
-                plan_output += \
-                    ' {node} Load({load}) Delivery({delivery}) Time({tmin}, {tmax}) -> '.format(
-                        node=node,
-                        delivery=plan.Value(delivery_var),
-                        load=plan.Value(load_var),
-                        tmin=str(timedelta(seconds=plan.Min(time_var))),
-                        tmax=str(timedelta(seconds=plan.Max(time_var))))
-
-                if routing.IsEnd(order):
-                    plan_output += ' EndRoute {0}. \n'.format(route_number)
-                    break
-                order = plan.Value(routing.NextVar(order))
-        plan_output += '\n'
-
-    return (plan_output, dropped)
     
 if __name__ == '__main__':
     # depot = Node([0, 0], 0)
@@ -66,7 +14,10 @@ if __name__ == '__main__':
     # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
     # vehicles = [Vehicle(3, start=depot, end=depot)]
     
-    depot, orders, vehicles = helper.generate_random_problem(num_orders=20)
+    # depot, orders, vehicles = helper.generate_random_problem(num_orders=2000)
+    depot, orders, vehicles = helper.generate_problem_from_file(
+                        r'C:\Users\91983\Documents\Coding\Optimization\InterIIT\code\InterIIT\Implementation\mock\dispatch_testing.xlsx', 
+                        r'C:\Users\91983\Documents\Coding\Optimization\InterIIT\code\InterIIT\Implementation\mock\pickups_testing.xlsx')
 
     vrp_instance = VRP(depot, orders, vehicles)
 
@@ -76,17 +27,18 @@ if __name__ == '__main__':
 
     manager, routing, solution = vrp_instance.process_VRP()
 
-    plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
-    vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+    print("Total Distance: ", total_distance)
+    # vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
     vrp_instance.vehicle_output_plot()
 
     # vrp_instance.vehicle_output_plot(block=False)
     # routes_list = vrp_instance.get_routes()
     
     # for vehicle_idx, route in routes_list.items():
-    #     if route == []:
+    #     if route == -1:
     #         continue
     #     for i in range(3):
     #         route.next_node(3)
@@ -94,11 +46,12 @@ if __name__ == '__main__':
     # for i in range(5):
     #     vrp_instance.add_dynamic_order(helper.generate_random_order())
     
-    # manager, routing, solution = vrp_instance.process_VRP(isReroute=True, rerouting_metaheuristic="GUIDED_LOCAL_SEARCH", time_limit=20)
+    # manager, routing, solution = vrp_instance.process_VRP(isReroute=True, rerouting_metaheuristic="AUTOMATIC", time_limit=20)
     # vrp_instance.vehicle_output_plot()
-    # plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    # plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
     # print(plan_output)
     # print('dropped nodes: ' + ', '.join(dropped))
+    # print('Total Distance: ', total_distance)
 
 
 
