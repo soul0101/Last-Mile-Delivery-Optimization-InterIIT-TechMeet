@@ -1,10 +1,10 @@
 import math
 import random 
 import numpy as np
-
+import copy
 from vehicle_routing.vrp import VRP 
 import vehicle_routing.helper as helper
-
+import vehicle_routing.clustering as clustering
 from datetime import timedelta
 
 def vehicle_output_string(manager, routing, plan):
@@ -65,22 +65,35 @@ if __name__ == '__main__':
     #         Order(1, [5, 3], 2), Order(1, [3, 1], 2), Order(1, [1, 6], 2), Order(1, [-5, -3], 1), Order(1, [-1, -4], 1), Order(1, [-3, 2], 1)]
     # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
     # vehicles = [Vehicle(3, start=depot, end=depot)]
+    num_orders = 2000
+    depot, orders, vehicles = helper.generate_random_problem(num_orders)
+    # print(orders)
+
     
-    depot, orders, vehicles = helper.generate_random_problem(num_orders=20)
+    clusters = clustering.clustered(orders, depot, num_orders)
+    # print(clusters.shape)
 
-    vrp_instance = VRP(depot, orders, vehicles)
 
-    # Check time window solution
-    # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
-    # vrp_instance.add_dynamic_order(new_order)
 
-    manager, routing, solution = vrp_instance.process_VRP()
 
-    plan_output, dropped = vehicle_output_string(manager, routing, solution)
-    print(plan_output)
-    print('dropped nodes: ' + ', '.join(dropped))
-    vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
-    vrp_instance.vehicle_output_plot()
+
+    
+
+    
+
+    # vrp_instance = VRP(depot, orders, vehicles)
+
+    # # Check time window solution
+    # # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
+    # # vrp_instance.add_dynamic_order(new_order)
+
+    # manager, routing, solution = vrp_instance.process_VRP()
+
+    # plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    # print(plan_output)
+    # print('dropped nodes: ' + ', '.join(dropped))
+    # vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+    # vrp_instance.vehicle_output_plot()
 
     # vrp_instance.vehicle_output_plot(block=False)
     # routes_list = vrp_instance.get_routes()
