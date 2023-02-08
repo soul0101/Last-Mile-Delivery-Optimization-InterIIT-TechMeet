@@ -68,17 +68,23 @@ class CityGraph():
         
         self.beta = beta
 
-    def calculate_katz_centrality(self):
-        return nx.katz_centrality(self.G, beta=self.beta)
-
     def get_priorities(self):
         self.calculate_order_density()
-        katz_centrality = self.calculate_katz_centrality()
 
-        priorities = {}
+        df = pd.read_csv('uber.csv')
+        maxi = max(ward['WARD_NO'])+1
+        mintime=df['mean_travel_time'].min()
+        M=[ [0 if i!=j else 1 for i in range(maxi)] for j in range(maxi)] #inv time matrix
+        for i in df.index:
+            source=df['sourceid'][i]
+            dest=df['dstid'][i]
+            if wards[source]['geometry'].touches(wards[dest]['geometry']):
+                M[source][dest]=3*mintime/df['mean_travel_time'][i]
 
-        for i in self.ward_list:
-            priorities[i] = katz_centrality[i]
+        v = [wards.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
+        v=multiply(M, v, maxi) #final vector
+
+        priorities = {x: v[x] for x in ward['WARD_NO']}
         
         for i in self.ward_list:
             for order in self.orders:
