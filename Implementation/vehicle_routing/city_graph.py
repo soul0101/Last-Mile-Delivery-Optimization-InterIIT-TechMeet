@@ -3,6 +3,7 @@ import math
 import networkx as nx
 import geopandas as gpd
 from shapely.geometry import Point
+import pandas as pd
 
 def multiply(A, v, n):
     x=[0 for _ in range(n)]
@@ -78,20 +79,20 @@ class CityGraph():
     def get_priorities(self):
         self.calculate_order_density()
 
-        df = pd.read_csv('uber.csv')
-        maxi = max(ward['WARD_NO'])+1
+        df = pd.read_csv(os.path.dirname(__file__) + '/../wards/uber.csv')
+        maxi = max(self.city['KGISWardNo'])+1
         mintime=df['mean_travel_time'].min()
         M=[ [0 if i!=j else 1 for i in range(maxi)] for j in range(maxi)] #inv time matrix
         for i in df.index:
             source=df['sourceid'][i]
             dest=df['dstid'][i]
-            if wards[source]['geometry'].touches(wards[dest]['geometry']):
+            if self.ward_list[source]['geometry'].touches(self.ward_list[dest]['geometry']):
                 M[source][dest]=3*mintime/df['mean_travel_time'][i]
 
-        v = [wards.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
+        v = [self.ward_list.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
         v=multiply(M, v, maxi) #final vector
 
-        priorities = {x: v[x] for x in ward['WARD_NO']}
+        priorities = {x: v[x]/100 for x in self.city['KGISWardNo']}
         
         for i in self.ward_list:
             for order in self.orders:

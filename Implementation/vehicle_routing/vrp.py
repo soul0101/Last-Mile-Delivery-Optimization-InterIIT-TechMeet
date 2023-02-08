@@ -132,7 +132,7 @@ class VRP:
         plt.figure()
 
     @helper.timer_func
-    def process_VRP(self, isReroute=False, centrality_check=False, edge_weight_type='haversine',
+    def process_VRP(self, isReroute=False, centrality_check=True, edge_weight_type='haversine',
             time_limit=300, total_transit_time = 10_000_000, max_wait_time=10_000, 
             max_route_distance=2000_000, equalize_routes=False, equalize_routes_penalty=10_000,
             first_sol_strategy="AUTOMATIC", initial_metaheuristic="AUTOMATIC", rerouting_metaheuristic="AUTOMATIC"):
