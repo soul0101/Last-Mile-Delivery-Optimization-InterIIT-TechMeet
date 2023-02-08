@@ -81,22 +81,22 @@ if __name__ == '__main__':
 
     
 
-    # vrp_instance = VRP(depot, orders, vehicles)
+    vrp_instance = VRP(depot, orders, vehicles)
 
-    # # Check time window solution
-    # # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
-    # # vrp_instance.add_dynamic_order(new_order)
+    # Check time window solution
+    # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
+    # vrp_instance.add_dynamic_order(new_order)
 
-    # manager, routing, solution = vrp_instance.process_VRP()
+    manager, routing, solution = vrp_instance.process_VRP()
 
-    # plan_output, dropped = vehicle_output_string(manager, routing, solution)
-    # print(plan_output)
-    # print('dropped nodes: ' + ', '.join(dropped))
-    # vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
-    # vrp_instance.vehicle_output_plot()
+    plan_output, dropped = vehicle_output_string(manager, routing, solution)
+    print(plan_output)
+    print('dropped nodes: ' + ', '.join(dropped))
+    vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+    vrp_instance.vehicle_output_plot()
 
-    # vrp_instance.vehicle_output_plot(block=False)
-    # routes_list = vrp_instance.get_routes()
+    vrp_instance.vehicle_output_plot(block=False)
+    routes_list = vrp_instance.get_routes()
     
     # for vehicle_idx, route in routes_list.items():
     #     if route == []:
