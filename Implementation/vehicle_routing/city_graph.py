@@ -71,7 +71,7 @@ class CityGraph():
             for order in self.orders:
                 if self.ward_list[i]['geometry'].contains(order.point):
                     self.ward_list[i]['order_density'] += 1
-            self.ward_list[i]['order_density'] /= (self.ward_list[i]['geometry'].area / 1000000)
+            self.ward_list[i]['order_density'] /= len(self.orders)
             beta[i] = self.ward_list[i]['order_density']
         
         self.beta = beta
@@ -89,9 +89,8 @@ class CityGraph():
             if self.ward_list[source]['geometry'].touches(self.ward_list[dest]['geometry']):
                 M[source][dest]=3*mintime/df['mean_travel_time'][i]
 
-        v = [self.ward_list.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
-        v=multiply(M, v, maxi) #final vector
-
+        vi = [self.ward_list.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
+        v=multiply(M, vi, maxi) #final vector
         priorities = {x: v[x]/100 for x in self.city['KGISWardNo']}
         
         for i in self.ward_list:
