@@ -4,6 +4,13 @@ import networkx as nx
 import geopandas as gpd
 from shapely.geometry import Point
 
+def multiply(A, v, n):
+    x=[0 for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            x[i]+=A[i][j]*v[j]
+    return x
+
 class CityGraph():
     def __init__(self, orders):
         self.orders = self.process_orders(orders)
