@@ -1,9 +1,11 @@
 import os
+import time
 import json
 import requests
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import shapefile as shp 
 import vehicle_routing.helper as helper
 from vehicle_routing.customers import Customers
 from vehicle_routing.vehicle import Fleet
@@ -75,6 +77,7 @@ class VRP:
 
     def build_vehicle_routes(self, manager, routing, solution):
         routes_list = {}
+        time_dimension = routing.GetDimensionOrDie('Time')
 
         for vehicle_idx in range(self.fleet.num_vehicles):
             veh_used = routing.IsVehicleUsed(solution, vehicle_idx)
@@ -83,7 +86,14 @@ class VRP:
                 cur_route = []
                 node = routing.Start(vehicle_idx)  # Get the starting node index
                 while not routing.IsEnd(node):
-                    cur_route.append(self.customers.customers[manager.IndexToNode(node)])
+                    time_val = solution.Min(time_dimension.CumulVar(node))
+                    
+                    current_order_object = self.customers.customers[manager.IndexToNode(node)]
+                    current_order_object.predicted_time = time_val
+                    print(time_val)
+                    current_order_object.routing_time = time.time()
+
+                    cur_route.append(current_order_object)
                     node = solution.Value(routing.NextVar(node))
                 cur_route.append(self.customers.customers[manager.IndexToNode(node)])
 
@@ -98,7 +108,76 @@ class VRP:
         
         self.routes_list = RoutesList(routes_list)
 
-    def vehicle_output_plot(self, block=True):
+    # def build_vehicle_routes(self, manager, routing, solution):
+    #     routes_list = {}
+    #     time_dimension = routing.GetDimensionOrDie('Time')
+
+    #     for vehicle_idx in range(self.fleet.num_vehicles):
+    #         veh_used = routing.IsVehicleUsed(solution, vehicle_idx)
+
+    #         if veh_used:
+    #             cur_route = []
+    #             node = routing.Start(vehicle_idx)  # Get the starting node index
+    #             while not routing.IsEnd(node):
+    #                 time_val = solution.Min(time_dimension.CumulVar(node))
+                    
+    #                 current_order_object = self.customers.customers[manager.IndexToNode(node)]
+    #                 current_order_object.predicted_time = time_val
+                    
+    #                 cur_route.append(current_order_object)
+    #                 node = solution.Value(routing.NextVar(node))
+    #             cur_route.append(self.customers.customers[manager.IndexToNode(node)])
+
+    #             for customer in cur_route:
+    #                 customer.vehicle = self.fleet.vehicle_list[vehicle_idx]
+
+    #             routes_list[vehicle_idx] = Route(cur_route, self.vehicles[vehicle_idx])
+    #         else:
+    #             routes_list[vehicle_idx] = -1
+            
+    #         self.fleet.vehicle_list[vehicle_idx].route = routes_list[vehicle_idx]
+        
+    #     self.routes_list = RoutesList(routes_list)
+
+    def vehicle_output_plot_routes(self, block=True, city_graph=False):
+        if city_graph is True:
+            self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+
+        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'))
+        for shape in sf.shapeRecords():
+            y = [i[0] for i in shape.shape.points[:]]
+            x = [i[1] for i in shape.shape.points[:]]
+            plt.plot(y,x)
+
+        plt.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
+
+        colors = ['red', 'blue', 'green', 'purple', 'darkblue', 'orange', 'brown', 'pink', 'olive', 'purple', 'tomato']
+
+        for vehicle_idx, route in self.get_routes().items():
+            if route == -1:
+                continue
+
+            x_coords = []
+            y_coords = []
+
+            for n in route.route:
+                x_coords.append(n.lon)
+                y_coords.append(n.lat)
+            plt.scatter(x_coords, y_coords, color=colors[vehicle_idx % len(colors)], s=10)
+            # plt.plot(x_coords[1:-1], y_coords[1:-1], color=colors[vehicle_idx % len(colors)])
+            # plt.plot(x_coords[:2], y_coords[:2], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
+            # plt.plot(x_coords[-2:], y_coords[-2:], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
+            
+        plt.title('Vehicle Routes')
+        plt.legend()
+        plt.grid()
+        plt.savefig(os.path.join(os.path.dirname(__file__), '..\plots\osrm_routes.png'), dpi=300)
+        plt.show(block=block)
+
+    def vehicle_output_plot(self, block=True, city_graph=False):
+        if city_graph is True:
+            self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+
         s_del_lon = []
         s_del_lat = []
         s_pick_lon = []
@@ -114,8 +193,8 @@ class VRP:
 
             # plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
 
-        plt.scatter(s_del_lon, s_del_lat, color='b', label='Delivery')
-        plt.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup')
+        plt.scatter(s_del_lon, s_del_lat, color='b', label='Delivery', s=20)
+        plt.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup', s=20)
         plt.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
 
         for vehicle_idx, route in self.get_routes().items():
@@ -318,9 +397,6 @@ class VRP:
         else:
             print("NO SOLUTION FOUND")
             return None
-            
-    def bin_pack(self, vehicle_id, order_ids, dimensions):
-        pass
 
     def export_shapefile(self):
         all_route_coords = []
@@ -330,7 +406,6 @@ class VRP:
         for route_index, route_obj in route_list.items():
             route_coords= []
             route_awb = []
-            print(route_obj)
             if route_obj == -1:
                 continue
             for order in route_obj.route:
@@ -342,8 +417,8 @@ class VRP:
             all_route_coords.append(route_coords)
             all_route_awbs.append(route_awb)
 
-        print(all_route_coords)
-        print(all_route_awbs)
+        # print(all_route_coords)
+        # print(all_route_awbs)
 
         geo_routes = []
         data = pd.DataFrame({'Route': [str(i+1) for i in range(len(all_route_coords))]})
@@ -356,7 +431,6 @@ class VRP:
             for point in route:
                 points_list.append(str(point[1])  + "," + str(point[0]))
             osrm_url = osrm_url_base + ";".join(points_list) + "?overview=full&geometries=geojson"
-            print(osrm_url)
             r = requests.get(osrm_url)
             t = json.loads(r.text)
             coordinates = t['routes'][0]['geometry']['coordinates']
@@ -367,4 +441,5 @@ class VRP:
 
         myGDF = gpd.GeoDataFrame(data, geometry=geo_routes)
         # myGDF.to_file(filename='myshapefile_test.shp.zip', driver='ESRI Shapefile')
-        myGDF.to_file(os.path.join(os.path.dirname(__file__), '..\shapefile\test.shp'))
+        myGDF.to_file(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'), mode='w')
+

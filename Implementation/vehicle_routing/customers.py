@@ -1,3 +1,4 @@
+import time
 import math
 import numpy as np
 from sklearn.metrics import pairwise
@@ -83,6 +84,8 @@ class Order(Node):
         self.vehicle = vehicle
         self.orientation = orientation
         self.position = position
+        self.predicted_time = None
+        self.routing_time = time.time()
 
         self.deadline = deadline
         self.priority = 0
