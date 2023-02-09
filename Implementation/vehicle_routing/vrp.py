@@ -1,7 +1,13 @@
+import os
+import json
+import requests
+import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
 import vehicle_routing.helper as helper
 from vehicle_routing.customers import Customers
 from vehicle_routing.vehicle import Fleet
+from shapely.geometry import Point, LineString
 from vehicle_routing.route import Route, RoutesList
 from ortools.constraint_solver import pywrapcp
 from vehicle_routing.city_graph import CityGraph
@@ -315,3 +321,50 @@ class VRP:
             
     def bin_pack(self, vehicle_id, order_ids, dimensions):
         pass
+
+    def export_shapefile(self):
+        all_route_coords = []
+        all_route_awbs = []
+
+        route_list = self.get_routes()
+        for route_index, route_obj in route_list.items():
+            route_coords= []
+            route_awb = []
+            print(route_obj)
+            if route_obj == -1:
+                continue
+            for order in route_obj.route:
+                route_coords.append(order.coordinates)
+                if order.type == 0:
+                    continue
+                route_awb.append([order.AWB, order.coordinates])
+                    
+            all_route_coords.append(route_coords)
+            all_route_awbs.append(route_awb)
+
+        print(all_route_coords)
+        print(all_route_awbs)
+
+        geo_routes = []
+        data = pd.DataFrame({'Route': [str(i+1) for i in range(len(all_route_coords))]})
+        #http://router.project-osrm.org/route/v1/driving/77.586607,12.909694;77.652492,12.91763?overview=full&geometries=geojson
+        # osrm_url_base = "https://routing.openstreetmap.de/routed-bike/route/v1/driving/"
+        osrm_url_base = "http://172.23.176.229:5000/route/v1/driving/"
+
+        for route in all_route_coords:
+            points_list = []
+            for point in route:
+                points_list.append(str(point[1])  + "," + str(point[0]))
+            osrm_url = osrm_url_base + ";".join(points_list) + "?overview=full&geometries=geojson"
+            print(osrm_url)
+            r = requests.get(osrm_url)
+            t = json.loads(r.text)
+            coordinates = t['routes'][0]['geometry']['coordinates']
+            points_list = []
+            for point in coordinates:
+                points_list.append(Point(point[0], point[1]))
+            geo_routes.append(LineString(points_list))
+
+        myGDF = gpd.GeoDataFrame(data, geometry=geo_routes)
+        # myGDF.to_file(filename='myshapefile_test.shp.zip', driver='ESRI Shapefile')
+        myGDF.to_file(os.path.join(os.path.dirname(__file__), '..\shapefile\test.shp'))

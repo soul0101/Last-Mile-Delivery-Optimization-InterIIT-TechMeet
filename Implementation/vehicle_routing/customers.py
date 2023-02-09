@@ -78,7 +78,7 @@ class Order(Node):
 
     def __init__(self, volume, coordinates, type, AWB=None, SKU=None, status=0, vehicle=None, orientation=None, position=None, start_time=None, end_time=None, deadline=0):
         super().__init__(coordinates, type, volume, status, start_time, end_time)
-        self.AWB = AWB
+        self.AWB = str(AWB) if AWB is not None else AWB
         self.SKU = SKU
         self.vehicle = vehicle
         self.orientation = orientation
