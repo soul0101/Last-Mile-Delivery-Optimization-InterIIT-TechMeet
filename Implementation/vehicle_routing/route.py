@@ -1,3 +1,4 @@
+import time
 from vehicle_routing.customers import Order, Node
 
 class Route:
@@ -69,3 +70,25 @@ class RoutesList():
                 curr_solution.append([])
         
         return curr_solution
+    
+    def skip_time(self, timedelta):
+        curr_solution = []
+        for vehicle_idx, route in self.routes_list.items():
+            if route != -1:
+                temp = []
+                for i, node in enumerate(route.route): 
+                    # print((node.routing_time + 60*timedelta), node.predicted_time)
+                    if node.status in [3,4]:
+                        continue
+                    elif node.predicted_time < timedelta:
+                        node.status = 3
+                    else:
+                        temp = route.route[i:]
+                        break
+                if temp == []:
+                    route = -1
+                else:
+                    route.route = temp
+                    route.vehicle.start = route.route[0]
+        
+        return curr_solution        
