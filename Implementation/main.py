@@ -6,6 +6,7 @@ from vehicle_routing.vrp import VRP
 import vehicle_routing.helper as helper
 import vehicle_routing.clustering as clustering
 from datetime import timedelta
+from vehicle_routing.route import RoutesList
 
 def vehicle_output_string(manager, routing, plan):
     """
@@ -14,7 +15,7 @@ def vehicle_output_string(manager, routing, plan):
     
     Arguments: 
     ------------------
-    routing: ortools.constraint_solver.pywrapcp.RoutingModel 
+    routing: ortools.constraint_solver.pywrapcp.RoutingMod  el 
     plan: ortools.constraint_solver.pywrapcp.Assignment
         The returned solution from the solver.
     Returns:
@@ -65,22 +66,30 @@ if __name__ == '__main__':
     #         Order(1, [5, 3], 2), Order(1, [3, 1], 2), Order(1, [1, 6], 2), Order(1, [-5, -3], 1), Order(1, [-1, -4], 1), Order(1, [-3, 2], 1)]
     # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
     # vehicles = [Vehicle(3, start=depot, end=depot)]
-    num_orders = 50
-    points_per_cluster = 5
+    num_orders = 200
+    points_per_cluster = 25
     depot, orders, vehicles = helper.generate_random_problem(num_orders)
     # print(orders)
 
     
     clusters = clustering.clustered(orders, depot, num_orders, points_per_cluster)
     # print(clusters.shape)
-    print(len(clusters), len(clusters[0]))
-
-    # vrp_instance = VRP(depot, orders, vehicles)
-    # # Check time window solution
-    # # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
-    # # vrp_instance.add_dynamic_order(new_order)
-
-    # manager, routing, solution = vrp_instance.process_VRP()
+    # print(len(clusters), len(clusters[0]))
+    vehicles_per_cluster= len(vehicles)//len(clusters)
+    all_routes=[]
+    for i in range(len(clusters)):
+        subvrp_instance = VRP(depot, clusters[i], vehicles[i*vehicles_per_cluster: (i+1)*vehicles_per_cluster]) #check for the case: if no of clusters not a factor of no of vehicles
+        manager, routing, solution = subvrp_instance.process_VRP()
+        if(i==0) :
+            subvrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
+        if i == len(clusters) -1 :
+            subvrp_instance.vehicle_output_plot(show=True)
+        else:
+            subvrp_instance.vehicle_output_plot(show=False)
+        #subvrp_instance.vehicle_output_plot(block=False)
+    # Check time window solution
+    # new_order = helper.generate_random_order(type=1, start_time=14, end_time=25)
+    # vrp_instance.add_dynamic_order(new_order)
 
     # plan_output, dropped = vehicle_output_string(manager, routing, solution)
     # print(plan_output)
@@ -89,7 +98,11 @@ if __name__ == '__main__':
     # vrp_instance.vehicle_output_plot()
 
     # vrp_instance.vehicle_output_plot(block=False)
-    # routes_list = vrp_instance.get_routes()
+        routes_list = subvrp_instance.get_routes()
+        all_routes+=routes_list
+        # print(routes_list)
+
+    vrp_instance=VRP(depot, orders, vehicles, RoutesList(all_routes))
     
     # for vehicle_idx, route in routes_list.items():
     #     if route == []:
@@ -105,7 +118,3 @@ if __name__ == '__main__':
     # plan_output, dropped = vehicle_output_string(manager, routing, solution)
     # print(plan_output)
     # print('dropped nodes: ' + ', '.join(dropped))
-
-
-
-    

@@ -38,13 +38,16 @@ class VRP:
         vehicle_output_plot(block: Optional[bool] = True) -> None: Plot the routes for each vehicle on a map.
 
     """
-    def __init__(self, depot, orders=None, vehicles=None):
+    def __init__(self, depot, orders=None, vehicles=None, routes_list = None):
         self.depot = depot
         self.orders = orders
         self.vehicles = vehicles  
         self.customers = None
         self.fleet = None   
-        self.routes_list = None
+        self.routes_list = routes_list
+
+    # def __add__(self, newInstance):
+    #     return VRP(self.depot,self.orders+newInstance.orders, self.vehicles+newInstance.vehicles, self.routes_list+newInstance.routes_list )
 
     def add_dynamic_order(self, new_order):
         self.orders.append(new_order)
@@ -92,7 +95,7 @@ class VRP:
         
         self.routes_list = RoutesList(routes_list)
 
-    def vehicle_output_plot(self, block=True):
+    def vehicle_output_plot(self, block=True, show=True):
         s_del_lon = []
         s_del_lat = []
         s_pick_lon = []
@@ -108,9 +111,14 @@ class VRP:
 
             plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
 
-        plt.scatter(s_del_lon, s_del_lat, color='b', label='Delivery')
-        plt.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup')
-        plt.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
+        if show:
+            plt.scatter(s_del_lon, s_del_lat, color='b', s=15, label='Delivery')
+            plt.scatter(s_pick_lon, s_pick_lat, color='g', s=15, label='Pickup')
+            plt.scatter(self.depot.lon, self.depot.lat, color='black', s=150, label='Depot')
+
+        else:
+            plt.scatter(s_del_lon, s_del_lat, color='b', s=15)
+            plt.scatter(s_pick_lon, s_pick_lat, color='g', s=15)
 
         for vehicle_idx, route in self.get_routes().items():
             if route == -1:
@@ -128,7 +136,8 @@ class VRP:
         plt.xlabel('Longitude')
         plt.ylabel('Latitude')
         plt.legend()
-        plt.show(block=block)
+        if show:
+            plt.show(block=block)
 
     def process_VRP(self, isReroute=False, centrality_check=False, 
             time_limit=300, total_transit_time = 10_000_000, max_wait_time=10_000, 
@@ -313,3 +322,7 @@ class VRP:
             
     def bin_pack(self, vehicle_id, order_ids, dimensions):
         pass
+
+# class subVRP(VRP):
+#     def __init__(self, depot, orders=None, vehicles=None):
+#         VRP.__init__(self, depot, orders=None, vehicles=None)

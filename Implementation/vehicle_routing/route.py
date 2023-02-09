@@ -44,6 +44,9 @@ class Route:
 class RoutesList():
     def __init__(self, routes_list):
         self.routes_list = routes_list
+
+    def __add__(self, newobj):
+        return RoutesList(self.routes_list+newobj.routes_list)
     
     def get_initial_routes(self):
         """
