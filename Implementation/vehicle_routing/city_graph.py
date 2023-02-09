@@ -3,6 +3,14 @@ import math
 import networkx as nx
 import geopandas as gpd
 from shapely.geometry import Point
+import pandas as pd
+
+def multiply(A, v, n):
+    x=[0 for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            x[i]+=A[i][j]*v[j]
+    return x
 
 class CityGraph():
     def __init__(self, orders):
@@ -63,22 +71,27 @@ class CityGraph():
             for order in self.orders:
                 if self.ward_list[i]['geometry'].contains(order.point):
                     self.ward_list[i]['order_density'] += 1
-            self.ward_list[i]['order_density'] /= (self.ward_list[i]['geometry'].area / 1000000)
+            self.ward_list[i]['order_density'] /= len(self.orders)
             beta[i] = self.ward_list[i]['order_density']
         
         self.beta = beta
 
-    def calculate_katz_centrality(self):
-        return nx.katz_centrality(self.G, beta=self.beta)
-
     def get_priorities(self):
         self.calculate_order_density()
-        katz_centrality = self.calculate_katz_centrality()
 
-        priorities = {}
+        df = pd.read_csv(os.path.dirname(__file__) + '/../wards/uber.csv')
+        maxi = max(self.city['KGISWardNo'])+1
+        mintime=df['mean_travel_time'].min()
+        M=[ [0 if i!=j else 1 for i in range(maxi)] for j in range(maxi)] #inv time matrix
+        for i in df.index:
+            source=df['sourceid'][i]
+            dest=df['dstid'][i]
+            if self.ward_list[source]['geometry'].touches(self.ward_list[dest]['geometry']):
+                M[source][dest]=3*mintime/df['mean_travel_time'][i]
 
-        for i in self.ward_list:
-            priorities[i] = katz_centrality[i]
+        vi = [self.ward_list.get(x, {}).get('order_density', 0) for x in range(maxi)] #initial priority vector, based on orders
+        v=multiply(M, vi, maxi) #final vector
+        priorities = {x: v[x]/100 for x in self.city['KGISWardNo']}
         
         for i in self.ward_list:
             for order in self.orders:

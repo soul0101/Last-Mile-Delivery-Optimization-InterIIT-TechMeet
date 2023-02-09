@@ -16,8 +16,8 @@ if __name__ == '__main__':
     # vehicles = [Vehicle(3, start=depot, end=depot)]
     
     # depot, orders, vehicles = helper.generate_random_problem(num_orders=2000)
-    mock_dispatch_filename = os.path.dirname(__file__) + r'\mock\dispatch_testing.xlsx'
-    mock_pickup_filename = os.path.dirname(__file__) + r'\mock\pickups_testing.xlsx'
+    mock_dispatch_filename = os.path.dirname(__file__) + r'/mock/dispatch_testing.xlsx'
+    mock_pickup_filename = os.path.dirname(__file__) + r'/mock/pickups_testing.xlsx'
     depot, orders, vehicles = helper.generate_problem_from_file(mock_dispatch_filename, mock_pickup_filename)
     vrp_instance = VRP(depot, orders, vehicles)
 
