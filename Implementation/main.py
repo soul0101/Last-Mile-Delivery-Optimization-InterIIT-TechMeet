@@ -9,16 +9,11 @@ import vehicle_routing.helper as helper
 from datetime import timedelta
     
 if __name__ == '__main__':
-    # depot = Node([0, 0], 0)
-    # orders = [Order(1, [0, 1], 1), Order(1, [1, 0], 1), Order(1, [1, 4], 1), Order(1, [2, 5], 1), Order(1, [6, 9], 1), 
-    #         Order(1, [5, 3], 2), Order(1, [3, 1], 2), Order(1, [1, 6], 2), Order(1, [-5, -3], 1), Order(1, [-1, -4], 1), Order(1, [-3, 2], 1)]
-    # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
-    # vehicles = [Vehicle(3, start=depot, end=depot)]
     
-    # depot, orders, vehicles = helper.generate_random_problem(num_orders=2000)
-    mock_dispatch_filename = os.path.dirname(__file__) + r'\mock\dispatch_testing.xlsx'
-    mock_pickup_filename = os.path.dirname(__file__) + r'\mock\pickups_testing.xlsx'
-    depot, orders, vehicles = helper.generate_problem_from_file(mock_dispatch_filename, mock_pickup_filename)
+    depot, orders, vehicles = helper.generate_random_problem(num_orders=20)
+    # mock_dispatch_filename = os.path.dirname(__file__) + r'\mock\dispatch_testing.xlsx'
+    # mock_pickup_filename = os.path.dirname(__file__) + r'\mock\pickups_testing.xlsx'
+    # depot, orders, vehicles = helper.generate_problem_from_file(mock_dispatch_filename, mock_pickup_filename)
     vrp_instance = VRP(depot, orders, vehicles)
 
     # Check time window solution
@@ -33,7 +28,8 @@ if __name__ == '__main__':
     print("Total Distance: ", total_distance)
     vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
     vrp_instance.vehicle_output_plot()
-
+    vrp_instance.export_shapefile()
+    
     # vrp_instance.vehicle_output_plot(block=False)
     # routes_list = vrp_instance.get_routes()
     
