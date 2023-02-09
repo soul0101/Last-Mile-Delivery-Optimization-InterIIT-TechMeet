@@ -108,37 +108,6 @@ class VRP:
         
         self.routes_list = RoutesList(routes_list)
 
-    # def build_vehicle_routes(self, manager, routing, solution):
-    #     routes_list = {}
-    #     time_dimension = routing.GetDimensionOrDie('Time')
-
-    #     for vehicle_idx in range(self.fleet.num_vehicles):
-    #         veh_used = routing.IsVehicleUsed(solution, vehicle_idx)
-
-    #         if veh_used:
-    #             cur_route = []
-    #             node = routing.Start(vehicle_idx)  # Get the starting node index
-    #             while not routing.IsEnd(node):
-    #                 time_val = solution.Min(time_dimension.CumulVar(node))
-                    
-    #                 current_order_object = self.customers.customers[manager.IndexToNode(node)]
-    #                 current_order_object.predicted_time = time_val
-                    
-    #                 cur_route.append(current_order_object)
-    #                 node = solution.Value(routing.NextVar(node))
-    #             cur_route.append(self.customers.customers[manager.IndexToNode(node)])
-
-    #             for customer in cur_route:
-    #                 customer.vehicle = self.fleet.vehicle_list[vehicle_idx]
-
-    #             routes_list[vehicle_idx] = Route(cur_route, self.vehicles[vehicle_idx])
-    #         else:
-    #             routes_list[vehicle_idx] = -1
-            
-    #         self.fleet.vehicle_list[vehicle_idx].route = routes_list[vehicle_idx]
-        
-    #     self.routes_list = RoutesList(routes_list)
-
     def vehicle_output_plot_routes(self, block=True, city_graph=False):
         if city_graph is True:
             self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
