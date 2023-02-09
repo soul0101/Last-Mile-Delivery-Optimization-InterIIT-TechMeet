@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 import math
-def clustered(orders, depot, num_orders):
+def clustered(orders, depot, num_orders, points_per_cluster):
     shifted_lat = np.array([i.lat - depot.lat for i in orders])
     shifted_lon = np.array([i.lon - depot.lon for i in orders])
     polar_angles = (np.arctan2(shifted_lon,shifted_lat)*180/np.pi).tolist()
@@ -12,8 +12,8 @@ def clustered(orders, depot, num_orders):
 
     orders = [order for _, order in sorted(zip(polar_angles, orders))]
     polar_angles = sorted(polar_angles)
-  
-    clusters_n = num_orders//500
+
+    clusters_n = num_orders//points_per_cluster
     cluster = []
     min_spread = math.inf
     for angle in range(0, 360, 5):
@@ -26,9 +26,9 @@ def clustered(orders, depot, num_orders):
             # print("temp", temp)
             temp_p = polar_angles[idx:] + polar_angles[:idx]
             for c in range(clusters_n):
-                clusters_temp.append(temp[c*500: (c+1)*500])
+                clusters_temp.append(temp[c*points_per_cluster: (c+1)*points_per_cluster])
                 # print("cluster temp", clusters_temp)
-                clusters_polar_temp.append(temp_p[c*500: (c+1)*500])
+                clusters_polar_temp.append(temp_p[c*points_per_cluster: (c+1)*points_per_cluster])
                 # print(np.std(temp_p[c*clusters_n: (c+1)*clusters_n]))
             m = max([np.std(clusters_polar_temp[k]) for k in range(clusters_n)])
             if m < min_spread:
