@@ -94,6 +94,9 @@ class Order(Node):
         self.priority = 0
         self._carryforward_penalty = None
 
+    def __lt__(self, other):
+        return self.lat < other.lat
+
     @property
     def carryforward_penalty(self):
         return 1000_000 * math.exp(-self.deadline) + 1000 * math.exp(7 * self.priority)
@@ -205,7 +208,7 @@ class Customers():
         url = url[:-1] + '?annotations=distance'
         r = requests.get(url)
         json_object = json.loads(r.text)
-        print(json_object)
+        # print(json_object)
         return np.ceil(json_object['distances'])
 
     def get_total_volume(self):
