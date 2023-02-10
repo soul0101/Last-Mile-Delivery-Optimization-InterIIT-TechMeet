@@ -82,7 +82,7 @@ def st_ui():
     
     if dynamic_pickup_button:
         for i in range(5):
-            st.session_state['vrp_instance'].add_dynamic_order(helper.generate_random_order())
+            st.session_state['vrp_instance'].add_dynamic_order(helper.generate_random_order(type=2))
         plot(st.session_state['vrp_instance'])
 
     if reroute_button:
