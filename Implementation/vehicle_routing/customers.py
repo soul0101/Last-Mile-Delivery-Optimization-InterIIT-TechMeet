@@ -1,5 +1,8 @@
+import json
 import time
 import math
+import requests
+import constants
 import numpy as np
 from sklearn.metrics import pairwise
 
@@ -182,8 +185,7 @@ class Customers():
         elif method == 'euclidean':
             self.distmat = self._euclidean(self.customers)
         else:
-            #OSRM
-            pass
+            self.distmat = self._osrm(self.customers)
 
     def _euclidean(self, nodes):
         # calculate the distance matrix using the euclidean method
@@ -194,6 +196,17 @@ class Customers():
         # calculate the distance matrix using the haversine method
         input_locations = [[math.radians(float(o.lat)), math.radians(float(o.lon))] for o in nodes]
         return np.ceil(pairwise.haversine_distances(input_locations) * 6371000)
+
+    def _osrm(self, nodes):
+        url = constants.OSRM_BASE_URL + 'table/v1/driving/'
+
+        for node in nodes:
+            url += str(node.lon) + ',' + str(node.lat) + ';'
+        url = url[:-1] + '?annotations=distance'
+        r = requests.get(url)
+        json_object = json.loads(r.text)
+        print(json_object)
+        return np.ceil(json_object['distances'])
 
     def get_total_volume(self):
         """

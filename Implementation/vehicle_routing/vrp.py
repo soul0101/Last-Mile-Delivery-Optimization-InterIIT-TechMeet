@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import constants
 import requests
 import pandas as pd
 import geopandas as gpd
@@ -121,7 +122,6 @@ class VRP:
         plt.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
 
         colors = ['red', 'blue', 'green', 'purple', 'darkblue', 'orange', 'brown', 'pink', 'olive', 'purple', 'tomato']
-
         for vehicle_idx, route in self.get_routes().items():
             if route == -1:
                 continue
@@ -132,7 +132,8 @@ class VRP:
             for n in route.route:
                 x_coords.append(n.lon)
                 y_coords.append(n.lat)
-            plt.scatter(x_coords, y_coords, color=colors[vehicle_idx % len(colors)], s=10)
+            plt.scatter(x_coords[1:-1], y_coords[1:-1], color=colors[0], s=10)
+            # plt.scatter(x_coords[1:-1], y_coords[1:-1], color=colors[vehicle_idx % len(colors)], s=10)
             # plt.plot(x_coords[1:-1], y_coords[1:-1], color=colors[vehicle_idx % len(colors)])
             # plt.plot(x_coords[:2], y_coords[:2], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
             # plt.plot(x_coords[-2:], y_coords[-2:], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
@@ -393,7 +394,7 @@ class VRP:
         data = pd.DataFrame({'Route': [str(i+1) for i in range(len(all_route_coords))]})
         #http://router.project-osrm.org/route/v1/driving/77.586607,12.909694;77.652492,12.91763?overview=full&geometries=geojson
         # osrm_url_base = "https://routing.openstreetmap.de/routed-bike/route/v1/driving/"
-        osrm_url_base = "http://172.23.176.229:5000/route/v1/driving/"
+        osrm_url_base = constants.OSRM_BASE_URL + "route/v1/driving/"
 
         for route in all_route_coords:
             points_list = []
