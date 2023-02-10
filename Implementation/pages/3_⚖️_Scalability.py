@@ -16,6 +16,9 @@ st.markdown('''
 - **Flexibility**: Clustering algos can be adapted and modified to incorporate specific constraints.
 ''')
 
+st.header("Benchmarks")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/benchmark.png")
+
 st.header("Sweep Algorithm")
 st.markdown("""
 - Used for grouping geographical coordinates based on their **cosine similarity** w.r.t. the depot.
