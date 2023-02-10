@@ -6,16 +6,16 @@ st.title("Stereoscopic Depth-Based Multi-Modal Volume Approximation")
 
 st.header("Methodology")
 
-# st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/setup1.png", width=400)
-# st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/setup2.png", width=300)
+# st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/setup1.png", width=400)
+# st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/setup2.png", width=300)
 
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/hardware.png")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/hardware.png")
 
 st.subheader("The flow of the entire process")
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/flow1.png")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/flow1.png")
 
 st.subheader("How do we get volume from the shape?")
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/flow2.png")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/flow2.png")
 
 st.header("Key advantages")
 st.markdown("""
@@ -28,4 +28,4 @@ st.markdown("""
 
 st.header("Results")
 st.markdown("We have obtained significant improvement by using the current **stereoscopic depth method** instead of the RGB-to-pointcloud approach. For this, we use the Intel Realsense Camera.")
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/streamlit/pages/assets/table.png")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/table.png")
