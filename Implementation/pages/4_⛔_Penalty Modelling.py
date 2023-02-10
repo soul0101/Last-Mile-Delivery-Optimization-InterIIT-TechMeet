@@ -19,14 +19,14 @@ def img_to_html(img_path):
     return img_html
 
 def st_ui():
-    penalty_order = Image.open(os.path.join(os.path.dirname(__file__), 'assets\penalty_order.png'))
+    penalty_order = Image.open(os.path.join(os.path.dirname(__file__), 'assets/penalty_order.png'))
 
     st.header("Penalty Modelling")
     st.markdown("""
     We consider the EDD of the orders as well as the Order Density Centrality while calculating the order priority. 
     """)
     st.subheader("EDD Penalty")
-    st.markdown("<p style='text-align: center; color: grey;'>"+img_to_html(os.path.join(os.path.dirname(__file__), 'assets\penalty_edd.png'))+"</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: grey;'>"+img_to_html(os.path.join(os.path.dirname(__file__), 'assets/penalty_edd.png'))+"</p>", unsafe_allow_html=True)
     st.latex(r'''
     P_{EDD} = 1000 * e ^ {- \frac{\text{- Due in(days)}}{2}}
     ''')
@@ -41,7 +41,8 @@ def st_ui():
     into consideration the priority of its neighbours' as well.
     """)
     
-    st.image(penalty_order)
+    # st.image(penalty_order)
+    st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/penalty_order.png")
     st.latex(r'''
     P_{\text{order density}} = e ^ {7 * \text{Order Density Centrality}}
     ''')
