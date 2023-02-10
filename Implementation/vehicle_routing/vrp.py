@@ -6,6 +6,8 @@ from vehicle_routing.route import Route, RoutesList
 from ortools.constraint_solver import pywrapcp
 from vehicle_routing.city_graph import CityGraph
 from ortools.constraint_solver import routing_enums_pb2
+import matplotlib
+import numpy as np
 
 class VRP:
     """
@@ -45,7 +47,7 @@ class VRP:
         self.customers = None
         self.fleet = None   
         self.routes_list = routes_list
-
+        
     # def __add__(self, newInstance):
     #     return VRP(self.depot,self.orders+newInstance.orders, self.vehicles+newInstance.vehicles, self.routes_list+newInstance.routes_list )
 
@@ -110,7 +112,6 @@ class VRP:
                 s_pick_lat.append(order.lat)
 
             plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
-
         if show:
             plt.scatter(s_del_lon, s_del_lat, color='b', s=15, label='Delivery')
             plt.scatter(s_pick_lon, s_pick_lat, color='g', s=15, label='Pickup')

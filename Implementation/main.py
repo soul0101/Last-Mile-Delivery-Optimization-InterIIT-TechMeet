@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # vehicles = [Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot), Vehicle(6, start=depot, end=depot)]
     # vehicles = [Vehicle(3, start=depot, end=depot)]
     num_orders = 200
-    points_per_cluster = 25
+    points_per_cluster = 20
     depot, orders, vehicles = helper.generate_random_problem(num_orders)
     # print(orders)
 
