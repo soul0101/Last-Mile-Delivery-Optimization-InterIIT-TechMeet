@@ -5,10 +5,17 @@ import geopandas as gpd
 from shapely.geometry import Point
 
 class CityGraph():
-    def __init__(self, orders):
-        self.orders = self.process_orders(orders)
+    def __init__(self, orders=None):
+        if orders is not None:
+            self.orders = self.process_orders(orders)
+        else:
+            self.orders = None
+            
         self.ward_list = self.process_wards()
         self.G = self.prepare_graph()
+
+    def set_orders(self, orders):
+        self.orders = self.process_orders(orders)
 
     def process_orders(self, orders):
         for order in orders:

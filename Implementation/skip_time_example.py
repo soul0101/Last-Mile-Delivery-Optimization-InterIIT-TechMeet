@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print("Total Distance: ", total_distance)
 
     # Skip time by 30 minutes
-    vrp_instance.routes_list.skip_time(30)
+    vrp_instance.routes_list.skip_time(20)
     
     # Add 5 Dynamic Pickups
     for i in range(5):
