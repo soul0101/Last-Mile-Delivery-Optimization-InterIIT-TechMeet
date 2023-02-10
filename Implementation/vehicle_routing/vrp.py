@@ -142,7 +142,7 @@ class VRP:
         plt.title('Vehicle Routes')
         plt.legend()
         plt.grid()
-        plt.savefig(os.path.join(os.path.dirname(__file__), '..\plots\osrm_routes.png'), dpi=300)
+        plt.savefig(os.path.join(os.path.dirname(__file__), '../plots/osrm_routes.png'), dpi=300)
         plt.show(block=block)
 
     def vehicle_return_plot_routes(self, block=True, city_graph=False):
