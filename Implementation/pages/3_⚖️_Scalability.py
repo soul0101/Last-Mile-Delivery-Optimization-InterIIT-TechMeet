@@ -9,15 +9,11 @@ As the company scales up in cities, 5000+ orders will become common, which will 
 Clustering the nodes reduces the complexity by a large amount and allows CVRP solvers to **handle very large instances** with **low optimality gaps**.
 """)
 
-st.header("Advantages of Clustering")
-st.markdown('''
-- **Reduced Complexity**: Dividing a large problem into smaller, more manageable sub-problems, making it easier to solve the VRP.
-- **Improved Scalability**: As the size of VRP increases, clustering handles the problem by dividing into smaller sub-problems.
-- **Flexibility**: Clustering algos can be adapted and modified to incorporate specific constraints.
-''')
-
-st.header("Benchmarks")
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/benchmark.png")
+# st.header("Advantages of Clustering")
+# st.markdown('''
+# - **Reduced Complexity**: Dividing a large problem into smaller, more manageable sub-problems, making it easier to solve the VRP.
+# - **Improved Scalability**: As the size of VRP increases, clustering handles the problem by dividing into smaller sub-problems.
+# ''')
 
 st.header("Sweep Algorithm")
 st.markdown("""
@@ -27,19 +23,6 @@ st.markdown("""
 st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/sweep.png")
 st.caption("An illustration showing the Sweep Algorithm for Clustering")
 
-st.subheader("Pseudocode for Sweep Clustering")
-
-st.code('''
-coords[Depo] = [0, 0]
-θi(Polar Angle) of ith order = tan-1(lat(i) / long(i))
-Sort customers according to θ in ascending order
-Set cluster_id = 1
-Set θc= 0°
-Sweep customer by increasing θc, add customer to cluster.
-Stop the sweep when we reach 500 nodes in the cluster.
-cluster_id = cluster_id + 1
-Repeat above 3 steps till we have completed allotment of all customers
-''')
 
 st.header("Innovation")
 
@@ -54,3 +37,21 @@ This way, we can evaluate how good the starting point is, by calculating the num
 
 st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/sweep2.png")
 st.caption("Showing different starting points and associated clusters")
+
+st.header("Benchmarks")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/benchmark.png")
+
+
+st.subheader("Pseudocode for Sweep Clustering")
+
+st.code('''
+coords[Depo] = [0, 0]
+θi(Polar Angle) of ith order = tan-1(lat(i) / long(i))
+Sort customers according to θ in ascending order
+Set cluster_id = 1
+Set θc= 0°
+Sweep customer by increasing θc, add customer to cluster.
+Stop the sweep when we reach 500 nodes in the cluster.
+cluster_id = cluster_id + 1
+Repeat above 3 steps till we have completed allotment of all customers
+''')

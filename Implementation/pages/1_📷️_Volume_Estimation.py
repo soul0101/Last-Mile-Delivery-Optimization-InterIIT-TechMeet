@@ -9,7 +9,7 @@ st.header("Methodology")
 # st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/setup1.png", width=400)
 # st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/setup2.png", width=300)
 
-st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/hardware.png")
+st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/Frame 48096285.png", width=800)
 
 st.subheader("The flow of the entire process")
 st.image("/home/gunjan/Desktop/GrowSimplee/InterIIT-Optimization/Implementation/pages/assets/flow1.png")
