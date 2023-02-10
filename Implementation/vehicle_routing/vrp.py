@@ -8,7 +8,6 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import shapefile as shp 
 import vehicle_routing.helper as helper
-import streamlit as st
 from vehicle_routing.customers import Customers
 from vehicle_routing.vehicle import Fleet
 from shapely.geometry import Point, LineString

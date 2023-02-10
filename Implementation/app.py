@@ -57,4 +57,3 @@ if submit:
     vrp_instance.runvrp()
     minutes_slider = st.sidebar.slider("Pick the amount of minutes to skip", 0, 60, 0, 5)
     vrp_instance.skip(minutes_to_skip=minutes_slider)
-
