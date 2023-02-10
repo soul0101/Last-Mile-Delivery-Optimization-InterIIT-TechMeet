@@ -45,16 +45,17 @@ class Route:
 class RoutesList():
     def __init__(self, routes_list):
         self.routes_list = routes_list
+
+    def __add__(self, newobj):
+        return RoutesList(self.routes_list+newobj.routes_list)
     
     def get_initial_routes(self):
         """
         Get the initial routes from the routes list
         """
         curr_solution = []
-        print(self.routes_list)
         for vehicle_idx, route in self.routes_list.items():
             temp = []
-            print(route)
             #route == -1 means the vehicle is not assigned any route
             if route != -1:
                 for node in route.route:
@@ -77,7 +78,6 @@ class RoutesList():
             if route != -1:
                 temp = []
                 for i, node in enumerate(route.route): 
-                    # print((node.routing_time + 60*timedelta), node.predicted_time)
                     if node.status in [3,4]:
                         continue
                     elif node.predicted_time < timedelta:

@@ -14,15 +14,37 @@ if __name__ == '__main__':
     mock_dispatch_filename = os.path.dirname(__file__) + r'\mock\dispatch_testing.xlsx'
     mock_pickup_filename = os.path.dirname(__file__) + r'\mock\pickups_testing.xlsx'
     depot, orders, vehicles = helper.generate_problem_from_file(mock_dispatch_filename, mock_pickup_filename)
-    vrp_instance = VRP(depot, orders, vehicles)
     
-    # manager, routing, solution = vrp_instance.process_VRP(edge_weight_type='osrm')
-    manager, routing, solution = vrp_instance.process_VRP(edge_weight_type='haversine')
+    num_orders = len(orders)
+    points_per_cluster = 50
+    clusters = clustering.clustered(depot, orders, points_per_cluster)
+    vehicles_per_cluster= math.ceil(len(vehicles)/len(clusters))
+    all_routes=[]
 
-    plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
-    print(plan_output)
-    print('dropped nodes: ' + ', '.join(dropped))
-    print("Total Distance: ", total_distance)
+    clustered_total_distance = 0
+    for i in range(len(clusters)):
+        subvrp_instance = VRP(depot, clusters[i], vehicles[i*vehicles_per_cluster: min((i+1)*vehicles_per_cluster, len(vehicles))]) #check for the case: if no of clusters not a factor of no of vehicles
+        manager, routing, solution = subvrp_instance.process_VRP()
+        plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
+        clustered_total_distance += total_distance
+        routes_list = subvrp_instance.get_routes()
+        all_routes.append(routes_list)
+
+    new_routes_list = {}
+    i = 0
+    for route in all_routes:
+        for key, route in route.items():
+            new_routes_list[i] = route
+            i += 1
+
+    print("clusterd total distance: ", clustered_total_distance)
+    # manager, routing, solution = vrp_instance.process_VRP(edge_weight_type='osrm')
+    # manager, routing, solution = vrp_instance.process_VRP(edge_weight_type='haversine')
+
+    # plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
+    # print(plan_output)
+    # print('dropped nodes: ' + ', '.join(dropped))
+    # print("Total Distance: ", total_distance)
 
     # vrp_instance.export_shapefile()
     # vrp_instance.vehicle_output_plot(block=False)
@@ -34,22 +56,20 @@ if __name__ == '__main__':
     # vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
     # vrp_instance.vehicle_output_plot()
 
-    vrp_instance.vehicle_output_plot(block=False)
+    # vrp_instance.vehicle_output_plot(block=False)
+
+    vrp_instance=VRP(depot, orders, vehicles, RoutesList(new_routes_list))
     
-    routes_list = vrp_instance.get_routes()
+    route_list = vrp_instance.routes_list
     for vehicle_idx, route in routes_list.items():
         if route == -1:
             continue
         for i in range(3):
             route.next_node(3)
-
-    for i in range(5):
-        vrp_instance.add_dynamic_order(helper.generate_random_order())
-    
-    vrp_instance.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
     
     manager, routing, solution = vrp_instance.process_VRP(isReroute=True)
     vrp_instance.vehicle_output_plot()
+    # vrp_instance.vehicle_output_plot()
     plan_output, dropped, total_distance = helper.vehicle_output_string(manager, routing, solution)
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
