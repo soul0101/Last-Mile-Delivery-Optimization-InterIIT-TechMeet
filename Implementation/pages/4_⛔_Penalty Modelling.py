@@ -2,7 +2,7 @@ import os
 from PIL import Image
 import streamlit as st
 
-st.set_page_config(page_title="Penalty Modelling", page_icon="🛵")
+st.set_page_config(page_title="Penalty Modelling", page_icon="⛔")
 
 import base64
 from pathlib import Path
@@ -11,6 +11,7 @@ def img_to_bytes(img_path):
     img_bytes = Path(img_path).read_bytes()
     encoded = base64.b64encode(img_bytes).decode()
     return encoded
+    
 def img_to_html(img_path):
     img_html = "<img width=400 src='data:image/png;base64,{}' class='img-fluid'>".format(
       img_to_bytes(img_path)
@@ -41,6 +42,9 @@ def st_ui():
     """)
     
     st.image(penalty_order)
+    st.latex(r'''
+    P_{\text{order density}} = e ^ {7 * \text{Order Density Centrality}}
+    ''')
 
 if __name__ == '__main__':
     st_ui()

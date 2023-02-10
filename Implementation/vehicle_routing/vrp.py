@@ -110,11 +110,11 @@ class VRP:
         
         self.routes_list = RoutesList(routes_list)
 
-    def vehicle_output_plot_routes(self, block=True, city_graph=False):
+    def vehicle_output_plot_routes(self, block=True, city_graph=False, shapefilename='test.shp'):
         if city_graph is True:
             self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
 
-        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'))
+        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/'+shapefilename))
         for shape in sf.shapeRecords():
             y = [i[0] for i in shape.shape.points[:]]
             x = [i[1] for i in shape.shape.points[:]]
@@ -271,7 +271,7 @@ class VRP:
         # ax.figure()
         return fig
 
-    def vehicle_output_plot(self, block=True, city_graph=False):
+    def vehicle_output_plot(self, block=True, city_graph=False, filename='0'):
         if city_graph is True:
             self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
 
@@ -311,6 +311,7 @@ class VRP:
         plt.ylabel('Latitude')
         plt.legend()
         plt.show(block=block)
+        plt.savefig(os.path.join(os.path.dirname(__file__), '..\plots\output_plot_{0}.png'.format(filename)), dpi=300)
         # plt.figure()
 
     @helper.timer_func
@@ -496,7 +497,7 @@ class VRP:
             print("NO SOLUTION FOUND")
             return None
 
-    def export_shapefile(self):
+    def export_shapefile(self, shapefilename='_test'):
         all_route_coords = []
         all_route_awbs = []
 
@@ -539,5 +540,5 @@ class VRP:
 
         myGDF = gpd.GeoDataFrame(data, geometry=geo_routes)
         # myGDF.to_file(filename='myshapefile_test.shp.zip', driver='ESRI Shapefile')
-        myGDF.to_file(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'), mode='w')
+        myGDF.to_file(os.path.join(os.path.dirname(__file__), '../shapefile/{0}.shp'.format(shapefilename)), mode='w')
 
