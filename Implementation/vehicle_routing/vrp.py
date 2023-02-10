@@ -8,6 +8,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import shapefile as shp 
 import vehicle_routing.helper as helper
+import streamlit as st
 from vehicle_routing.customers import Customers
 from vehicle_routing.vehicle import Fleet
 from shapely.geometry import Point, LineString
@@ -143,6 +144,88 @@ class VRP:
         plt.grid()
         plt.savefig(os.path.join(os.path.dirname(__file__), '..\plots\osrm_routes.png'), dpi=300)
         plt.show(block=block)
+
+    def vehicle_return_plot_routes(self, block=True, city_graph=False):
+        fig, ax = plt.subplots()
+        if city_graph is True:
+            self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3, ax=ax)
+            print('city printed')
+
+        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'))
+        
+        for shape in sf.shapeRecords():
+            y = [i[0] for i in shape.shape.points[:]]
+            x = [i[1] for i in shape.shape.points[:]]
+            ax.plot(y,x)
+
+        ax.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
+
+        colors = ['red', 'blue', 'green', 'purple', 'darkblue', 'orange', 'brown', 'pink', 'olive', 'purple', 'tomato']
+        for vehicle_idx, route in self.get_routes().items():
+            if route == -1:
+                continue
+
+            x_coords = []
+            y_coords = []
+
+            for n in route.route:
+                x_coords.append(n.lon)
+                y_coords.append(n.lat)
+            ax.scatter(x_coords[1:-1], y_coords[1:-1], color=colors[0], s=10)
+            # plt.scatter(x_coords[1:-1], y_coords[1:-1], color=colors[vehicle_idx % len(colors)], s=10)
+            # plt.plot(x_coords[1:-1], y_coords[1:-1], color=colors[vehicle_idx % len(colors)])
+            # plt.plot(x_coords[:2], y_coords[:2], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
+            # plt.plot(x_coords[-2:], y_coords[-2:], color=colors[vehicle_idx % len(colors)], linestyle='--', linewidth=1)
+            
+        ax.set_title('Vehicle Routes')
+        ax.legend()
+        ax.grid()
+        # plt.savefig(os.path.join(os.path.dirname(__file__), '../plots/osrm_routes.png'), dpi=300)
+        return fig
+
+    def vehicle_return_plot(self, block=True, city_graph=False):
+        fig, ax = plt.subplots()
+        if city_graph is True:
+            self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3, ax=ax)
+
+        s_del_lon = []
+        s_del_lat = []
+        s_pick_lon = []
+        s_pick_lat = []
+
+        for order in self.customers.orders:
+            if order.type == 1:
+                s_del_lon.append(order.lon)
+                s_del_lat.append(order.lat)
+            else:
+                s_pick_lon.append(order.lon)
+                s_pick_lat.append(order.lat)
+
+            # plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
+
+        ax.scatter(s_del_lon, s_del_lat, color='b', label='Delivery', s=20)
+        ax.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup', s=20)
+        ax.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
+
+        for vehicle_idx, route in self.get_routes().items():
+            if route == -1:
+                continue
+
+            lon_coords = []
+            lat_coords = []
+
+            for n in route.route:
+                lon_coords.append(n.lon)
+                lat_coords.append(n.lat)
+            ax.plot(lon_coords, lat_coords)
+            
+        ax.set_title('Routes')
+        ax.set_xlabel('Longitude')
+        ax.set_ylabel('Latitude')
+        ax.legend()
+        # ax.show(block=block)
+        # ax.figure()
+        return fig
 
     def vehicle_output_plot(self, block=True, city_graph=False):
         if city_graph is True:
