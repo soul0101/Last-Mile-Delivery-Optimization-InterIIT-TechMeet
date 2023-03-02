@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print("Total Distance: ", total_distance)
 
     # Skip time by 30 minutes
-    vrp_instance.routes_list.skip_time(20)
+    vrp_instance.routes_list.skip_time(30)
     
     # Add 5 Dynamic Pickups
     for i in range(5):
@@ -39,3 +39,6 @@ if __name__ == '__main__':
     print(plan_output)
     print('dropped nodes: ' + ', '.join(dropped))
     print('Total Distance: ', total_distance)
+
+    vrp_instance.export_shapefile(shapefilename='_reroute')
+    vrp_instance.vehicle_output_plot_routes(shapefilename='_reroute')

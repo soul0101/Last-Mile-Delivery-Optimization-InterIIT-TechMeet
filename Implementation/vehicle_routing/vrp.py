@@ -8,7 +8,6 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import shapefile as shp 
 import vehicle_routing.helper as helper
-import streamlit as st
 from vehicle_routing.customers import Customers
 from vehicle_routing.vehicle import Fleet
 from shapely.geometry import Point, LineString
@@ -56,6 +55,7 @@ class VRP:
         self.customers = None
         self.fleet = None   
         self.routes_list = routes_list
+        self.city_graph = CityGraph()
 
     def add_dynamic_order(self, new_order):
         self.orders.append(new_order)
@@ -110,11 +110,11 @@ class VRP:
         
         self.routes_list = RoutesList(routes_list)
 
-    def vehicle_output_plot_routes(self, block=True, city_graph=False):
+    def vehicle_output_plot_routes(self, block=True, city_graph=False, shapefilename='test.shp'):
         if city_graph is True:
             self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
 
-        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'))
+        sf = shp.Reader(os.path.join(os.path.dirname(__file__), '../shapefile/'+shapefilename))
         for shape in sf.shapeRecords():
             y = [i[0] for i in shape.shape.points[:]]
             x = [i[1] for i in shape.shape.points[:]]
@@ -192,7 +192,8 @@ class VRP:
         s_del_lat = []
         s_pick_lon = []
         s_pick_lat = []
-
+        s_dyn_lat = []
+        s_dyn_lon = []
         for order in self.customers.orders:
             if order.type == 1:
                 s_del_lon.append(order.lon)
@@ -202,7 +203,13 @@ class VRP:
                 s_pick_lat.append(order.lat)
 
             # plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
+        
+        for order in self.orders:
+            if order.status == 0:
+                s_dyn_lat.append(order.lat)
+                s_dyn_lon.append(order.lon)
 
+        ax.scatter(s_dyn_lon, s_dyn_lat, color='r', label='Unrouted', marker='*', s=30)
         ax.scatter(s_del_lon, s_del_lat, color='b', label='Delivery', s=20)
         ax.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup', s=20)
         ax.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
@@ -227,7 +234,44 @@ class VRP:
         # ax.figure()
         return fig
 
-    def vehicle_output_plot(self, block=True, city_graph=False):
+    def vehicle_return_scatter(self, block=True, city_graph=False, dynamic=False):
+        fig, ax = plt.subplots()
+        if city_graph is True:
+            self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3, ax=ax)
+
+        s_del_lon = []
+        s_del_lat = []
+        s_pick_lon = []
+        s_pick_lat = []
+        s_dyn_lat = []
+        s_dyn_lon = []
+        for order in self.orders:
+            if order.status == 0 and dynamic:
+                s_dyn_lat.append(order.lat)
+                s_dyn_lon.append(order.lon)
+            elif order.type == 1:
+                s_del_lon.append(order.lon)
+                s_del_lat.append(order.lat)
+            else:
+                s_pick_lon.append(order.lon)
+                s_pick_lat.append(order.lat)
+
+            # plt.text(order.lon, order.lat, order.current_vrp_index, fontsize = 8)
+
+        ax.scatter(s_dyn_lon, s_dyn_lat, color='r', label='Unrouted', marker='*', s=30)
+        ax.scatter(s_del_lon, s_del_lat, color='b', label='Delivery', s=20)
+        ax.scatter(s_pick_lon, s_pick_lat, color='g', label='Pickup', s=20)
+        ax.scatter(self.depot.lon, self.depot.lat, color='black', s=70, label='Depot')
+            
+        ax.set_title('Distribution')
+        ax.set_xlabel('Longitude')
+        ax.set_ylabel('Latitude')
+        ax.legend()
+        # ax.show(block=block)
+        # ax.figure()
+        return fig
+
+    def vehicle_output_plot(self, block=True, city_graph=False, filename='0'):
         if city_graph is True:
             self.city_graph.city.plot(facecolor="lightgrey", edgecolor="grey", linewidth=0.3)
 
@@ -267,6 +311,7 @@ class VRP:
         plt.ylabel('Latitude')
         plt.legend()
         plt.show(block=block)
+        plt.savefig(os.path.join(os.path.dirname(__file__), '..\plots\output_plot_{0}.png'.format(filename)), dpi=300)
         # plt.figure()
 
     @helper.timer_func
@@ -278,7 +323,8 @@ class VRP:
         self.fleet = Fleet(self.vehicles)
         self.customers = Customers(self.depot, self.orders)
         self.fleet.set_starts_ends()
-        self.city_graph = CityGraph(self.customers.orders)
+
+        self.city_graph.set_orders(self.orders)
 
         if centrality_check:
             self.priorities = self.city_graph.get_priorities()
@@ -451,7 +497,7 @@ class VRP:
             print("NO SOLUTION FOUND")
             return None
 
-    def export_shapefile(self):
+    def export_shapefile(self, shapefilename='_test'):
         all_route_coords = []
         all_route_awbs = []
 
@@ -494,5 +540,5 @@ class VRP:
 
         myGDF = gpd.GeoDataFrame(data, geometry=geo_routes)
         # myGDF.to_file(filename='myshapefile_test.shp.zip', driver='ESRI Shapefile')
-        myGDF.to_file(os.path.join(os.path.dirname(__file__), '../shapefile/test.shp'), mode='w')
+        myGDF.to_file(os.path.join(os.path.dirname(__file__), '../shapefile/{0}.shp'.format(shapefilename)), mode='w')
 
